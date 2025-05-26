@@ -33,7 +33,7 @@ const Navbar = () => {
         <div className="flex justify-between items-center h-16">
           <div className="flex items-center space-x-8">
             <Link to="/" className="text-[#D4A017] text-xl font-bold">
-              Library App
+              Library App - Knowledge is power
             </Link>
             {user && (
               <div className="flex space-x-6">
@@ -55,7 +55,7 @@ const Navbar = () => {
           <div className="flex items-center space-x-4">
             {user ? (
               <>
-                <span className="text-sm">{user.email}</span>
+                <span className="text-sm">{user.user_metadata?.name || user.email}</span>
                 <Button 
                   onClick={handleSignOut}
                   className="bg-[#D4A017] hover:bg-[#B8900F] text-[#003087] font-medium"

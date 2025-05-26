@@ -15,6 +15,7 @@ export type Database = {
           available: boolean | null
           created_at: string
           id: string
+          info: string | null
           isbn: string
           tittle: string | null
         }
@@ -23,6 +24,7 @@ export type Database = {
           available?: boolean | null
           created_at?: string
           id?: string
+          info?: string | null
           isbn: string
           tittle?: string | null
         }
@@ -31,6 +33,7 @@ export type Database = {
           available?: boolean | null
           created_at?: string
           id?: string
+          info?: string | null
           isbn?: string
           tittle?: string | null
         }
@@ -86,16 +89,19 @@ export type Database = {
           created_at: string
           email: string | null
           id: string
+          name: string | null
         }
         Insert: {
           created_at?: string
           email?: string | null
           id?: string
+          name?: string | null
         }
         Update: {
           created_at?: string
           email?: string | null
           id?: string
+          name?: string | null
         }
         Relationships: []
       }

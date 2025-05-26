@@ -2,10 +2,16 @@
 import { supabase } from "@/integrations/supabase/client";
 import { User, Session } from '@supabase/supabase-js';
 
-export const signUp = async (email: string, password: string) => {
+export const signUp = async (email: string, password: string, name?: string) => {
   const { data, error } = await supabase.auth.signUp({
     email,
     password,
+    options: {
+      data: {
+        name: name || '',
+      },
+      emailRedirectTo: undefined // Disable email verification
+    }
   });
   return { data, error };
 };

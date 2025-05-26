@@ -11,6 +11,7 @@ interface Book {
   author: string;
   isbn: string;
   available: boolean;
+  info: string | null;
 }
 
 interface BookCardProps {
@@ -41,6 +42,8 @@ const BookCard = ({ book, onBookUpdate }: BookCardProps) => {
       const returnDate = new Date();
       returnDate.setDate(returnDate.getDate() + 7);
 
+      console.log('Creating borrow record for user:', user.id, 'book:', book.id);
+
       // Create borrow record
       const { error: borrowError } = await supabase
         .from('borrows')
@@ -52,7 +55,12 @@ const BookCard = ({ book, onBookUpdate }: BookCardProps) => {
           returned: false,
         });
 
-      if (borrowError) throw borrowError;
+      if (borrowError) {
+        console.error('Borrow error:', borrowError);
+        throw borrowError;
+      }
+
+      console.log('Updating book availability for book:', book.id);
 
       // Update book availability
       const { error: updateError } = await supabase
@@ -60,7 +68,10 @@ const BookCard = ({ book, onBookUpdate }: BookCardProps) => {
         .update({ available: false })
         .eq('id', book.id);
 
-      if (updateError) throw updateError;
+      if (updateError) {
+        console.error('Update error:', updateError);
+        throw updateError;
+      }
 
       toast({
         title: "Success",
@@ -69,6 +80,7 @@ const BookCard = ({ book, onBookUpdate }: BookCardProps) => {
 
       onBookUpdate();
     } catch (error: any) {
+      console.error('Full error:', error);
       toast({
         title: "Error",
         description: error.message || "Failed to borrow book",
@@ -84,6 +96,9 @@ const BookCard = ({ book, onBookUpdate }: BookCardProps) => {
       <h3 className="text-xl font-bold text-[#003087] mb-2">{book.tittle}</h3>
       <p className="text-gray-700 mb-1"><span className="font-medium">Author:</span> {book.author}</p>
       <p className="text-gray-700 mb-1"><span className="font-medium">ISBN:</span> {book.isbn}</p>
+      {book.info && (
+        <p className="text-gray-700 mb-1"><span className="font-medium">Info:</span> {book.info}</p>
+      )}
       <p className="text-gray-700 mb-4">
         <span className="font-medium">Status:</span> 
         <span className={`ml-2 px-2 py-1 rounded-full text-xs font-medium ${

@@ -11,6 +11,7 @@ const AuthForm = () => {
   const [isSignUp, setIsSignUp] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [name, setName] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -21,7 +22,7 @@ const AuthForm = () => {
 
     try {
       const { data, error } = isSignUp 
-        ? await signUp(email, password)
+        ? await signUp(email, password, name)
         : await signIn(email, password);
 
       if (error) {
@@ -34,12 +35,10 @@ const AuthForm = () => {
         toast({
           title: "Success",
           description: isSignUp 
-            ? "Account created successfully! Please check your email to verify your account."
+            ? "Account created successfully!"
             : "Signed in successfully!",
         });
-        if (!isSignUp) {
-          navigate('/');
-        }
+        navigate('/');
       }
     } catch (error) {
       toast({
@@ -60,6 +59,23 @@ const AuthForm = () => {
         </h2>
         
         <form onSubmit={handleSubmit} className="space-y-6">
+          {isSignUp && (
+            <div>
+              <Label htmlFor="name" className="text-[#003087] font-medium">
+                Name
+              </Label>
+              <Input
+                id="name"
+                type="text"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                required
+                className="mt-1 border-gray-300 focus:border-[#003087] focus:ring-[#003087]"
+                placeholder="Enter your full name"
+              />
+            </div>
+          )}
+          
           <div>
             <Label htmlFor="email" className="text-[#003087] font-medium">
               Email

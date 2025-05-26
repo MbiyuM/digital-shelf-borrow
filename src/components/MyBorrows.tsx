@@ -15,6 +15,7 @@ interface BorrowRecord {
     tittle: string;
     author: string;
     isbn: string;
+    info: string | null;
   };
 }
 
@@ -25,9 +26,14 @@ const MyBorrows = () => {
   const { toast } = useToast();
 
   const fetchBorrows = async () => {
-    if (!user) return;
+    if (!user) {
+      setLoading(false);
+      return;
+    }
 
     try {
+      console.log('Fetching borrows for user:', user.id);
+      
       const { data, error } = await supabase
         .from('borrows')
         .select(`
@@ -35,16 +41,22 @@ const MyBorrows = () => {
           books (
             tittle,
             author,
-            isbn
+            isbn,
+            info
           )
         `)
         .eq('user_id', user.id)
         .order('borrow_date', { ascending: false });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error fetching borrows:', error);
+        throw error;
+      }
       
+      console.log('Fetched borrows:', data);
       setBorrows(data || []);
     } catch (error: any) {
+      console.error('Full error:', error);
       toast({
         title: "Error",
         description: error.message || "Failed to fetch your borrows",
@@ -57,13 +69,18 @@ const MyBorrows = () => {
 
   const handleReturn = async (borrowId: string, bookId: string) => {
     try {
+      console.log('Returning book:', { borrowId, bookId });
+      
       // Update borrow record
       const { error: borrowError } = await supabase
         .from('borrows')
         .update({ returned: true })
         .eq('id', borrowId);
 
-      if (borrowError) throw borrowError;
+      if (borrowError) {
+        console.error('Borrow update error:', borrowError);
+        throw borrowError;
+      }
 
       // Update book availability
       const { error: bookError } = await supabase
@@ -71,7 +88,10 @@ const MyBorrows = () => {
         .update({ available: true })
         .eq('id', bookId);
 
-      if (bookError) throw bookError;
+      if (bookError) {
+        console.error('Book update error:', bookError);
+        throw bookError;
+      }
 
       toast({
         title: "Success",
@@ -80,6 +100,7 @@ const MyBorrows = () => {
 
       fetchBorrows();
     } catch (error: any) {
+      console.error('Return error:', error);
       toast({
         title: "Error",
         description: error.message || "Failed to return book",
@@ -124,6 +145,14 @@ const MyBorrows = () => {
     );
   }
 
+  if (!user) {
+    return (
+      <div className="text-center py-12">
+        <p className="text-gray-500 text-lg">Please sign in to view your borrowed books.</p>
+      </div>
+    );
+  }
+
   if (borrows.length === 0) {
     return (
       <div className="text-center py-12">
@@ -147,6 +176,11 @@ const MyBorrows = () => {
               <p className="text-gray-700 mb-1">
                 <span className="font-medium">ISBN:</span> {borrow.books.isbn}
               </p>
+              {borrow.books.info && (
+                <p className="text-gray-700 mb-1">
+                  <span className="font-medium">Info:</span> {borrow.books.info}
+                </p>
+              )}
               <p className="text-gray-700 mb-1">
                 <span className="font-medium">Borrowed:</span> {new Date(borrow.borrow_date).toLocaleDateString()}
               </p>

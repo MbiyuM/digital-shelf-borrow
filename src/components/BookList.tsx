@@ -12,6 +12,7 @@ interface Book {
   author: string;
   isbn: string;
   available: boolean;
+  info: string | null;
 }
 
 const BookList = () => {
@@ -31,9 +32,11 @@ const BookList = () => {
 
       if (error) throw error;
       
+      console.log('Fetched books:', data);
       setBooks(data || []);
       setFilteredBooks(data || []);
     } catch (error: any) {
+      console.error('Error fetching books:', error);
       toast({
         title: "Error",
         description: error.message || "Failed to fetch books",
